@@ -1,0 +1,35 @@
+- hosts: all
+  become: true
+  become_user: root
+  tasks:
+    - name: delete old deployment
+      command: kubectl delete -f /home/ubuntu/Deployment.yml --kubeconfig=/home/ubuntu/.kube/config
+      ignore_errors: true
+    - name: delete old service
+      command: kubectl delete -f /home/ubuntu/Service.yml --kubeconfig=/home/ubuntu/.kube/config
+      ignore_errors: true
+    - name: create new deployment
+      command: kubectl apply -f /home/ubuntu/Deployment.yml --kubeconfig=/home/ubuntu/.kube/config
+    - name: create new service
+      command: kubectl apply -f /home/ubuntu/Service.yml --force --kubeconfig=/home/ubuntu/.kube/config
+    - name: make script executable
+      command: "chmod +x /home/ubuntu/kubect-port-forward.sh"
+    - name: kubectl port forward nodeport to service port and run the command in background
+      command: nohup /bin/sh "/home/ubuntu/kubect-port-forward.sh"
+      async: 100000
+      poll: 10
+      register: scrout
+    - name: Some task just to debug
+      debug: var=scrout.stdout_lines
+    # - name: kubectl port forward nodeport to service port and run the command in background
+    #   shell: "nohup (/home/ubuntu/kubect-port-forward.sh &)"
+    #   async: 10
+    #   poll: 0
+
+    # - name: kubectl port forward nodeport to service port and run the command in background
+    #   shell: "start-stop-daemon --start --quiet --exec /home/ubuntu/kubect-port-forward.sh"
+    # args:
+    #   executable: "/bin/bash"
+
+    # poll: 0
+    # command: "kubectl port-forward --address 0.0.0.0 svc/myfirstdevopsservice 30000:80 &"
