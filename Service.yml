@@ -6,18 +6,7 @@ spec:
   selector:
     app: myapp
   ports:
-    # - protocol: TCP
-    # Port accessible inside cluster
     - port: 80
       # Port to forward to inside the pod
       targetPort: 80
-      # Port accessible outside cluster
-      # nodePort: 30000
-  # externalIPs:
-  #   - 44.204.177.126
-  # clusterIP: 10.103.141.104
   type: LoadBalancer
-# status:
-#   loadBalancer:
-#     ingress:
-#       - ip: 44.197.246.90
